@@ -1,0 +1,269 @@
+import unittest
+import pygame
+from pygame.locals import *
+from flappybird import WIN_WIDTH, Bird, PipePair, load_images
+from unittest.mock import patch, Mock
+
+class TestBirdClass(unittest.TestCase):
+
+    def setUp(self):
+        pygame.init()
+
+    def tearDown(self):
+        pygame.quit()
+
+    def test_bird_initialization(self):
+        images = (pygame.Surface((32, 32)), pygame.Surface((32, 32)))  # Placeholder surfaces for testing
+        bird = Bird(100, 200, 1000, images)
+
+        self.assertEqual(bird.x, 100)
+        self.assertEqual(bird.y, 200)
+        self.assertEqual(bird.msec_to_climb, 1000)
+        self.assertEqual(bird.WIDTH, 32)
+        self.assertEqual(bird.HEIGHT, 32)
+        self.assertEqual(bird.SINK_SPEED, 0.15)
+        self.assertEqual(bird.CLIMB_SPEED, 0.3)
+        self.assertEqual(bird.CLIMB_DURATION, 333.3)
+        self.assertIsInstance(bird._img_wingup, pygame.Surface)
+        self.assertIsInstance(bird._img_wingdown, pygame.Surface)
+        self.assertIsInstance(bird._mask_wingup, pygame.mask.Mask)
+        self.assertIsInstance(bird._mask_wingdown, pygame.mask.Mask)
+
+class TestBirdClass(unittest.TestCase):
+
+    def setUp(self):
+        pygame.init()
+
+    def tearDown(self):
+        pygame.quit()
+
+    def test_bird_update(self):
+        images = (pygame.Surface((32, 32)), pygame.Surface((32, 32)))  # Placeholder surfaces for testing
+        bird = Bird(100, 200, 1000, images)
+
+        initial_y = bird.y
+        bird.update()
+        self.assertLess(bird.y, initial_y)  # Bird should move up when updating with msec_to_climb > 0
+
+        bird.msec_to_climb = 0
+        initial_y = bird.y
+        bird.update()
+        self.assertGreater(bird.y, initial_y)  # Bird should move down when updating with msec_to_climb = 0
+
+def test_bird_image(self):
+    images = (pygame.Surface((32, 32)), pygame.Surface((32, 32)))  # Placeholder surfaces for testing
+    bird = Bird(100, 200, 1000, images)
+
+    # Mocking the time to ensure consistent image selection
+    pygame.time.get_ticks = lambda: 300
+
+    self.assertTrue(self.surface_equal(bird.image, bird._img_wingdown))
+
+    pygame.time.get_ticks = lambda: 600
+    self.assertTrue(self.surface_equal(bird.image, bird._img_wingup))
+
+def surface_equal(self, surface1, surface2):
+    width, height = surface1.get_size()
+    for x in range(width):
+        for y in range(height):
+            if surface1.get_at((x, y)) != surface2.get_at((x, y)):
+                return False
+    return True
+
+def test_bird_mask(self):
+    images = (pygame.Surface((32, 32)), pygame.Surface((32, 32)))  # Placeholder surfaces for testing
+    bird = Bird(100, 200, 1000, images)
+
+    # Mocking the time to ensure consistent mask selection
+    pygame.time.get_ticks = lambda: 300
+
+    self.assertTrue(bird.mask.overlap(bird._mask_wingdown, (0, 0)))  # Masks should overlap when ticks % 500 < 250
+
+    pygame.time.get_ticks = lambda: 600
+    self.assertTrue(bird.mask.overlap(bird._mask_wingup, (0, 0)))  # Masks should overlap when ticks % 500 >= 250
+
+    def test_bird_rect(self):
+        images = (pygame.Surface((32, 32)), pygame.Surface((32, 32)))  # Placeholder surfaces for testing
+        bird = Bird(100, 200, 1000, images)
+
+        rect = bird.rect
+        self.assertEqual(rect.x, bird.x)
+        self.assertEqual(rect.y, bird.y)
+        self.assertEqual(rect.width, Bird.WIDTH)
+        self.assertEqual(rect.height, Bird.HEIGHT)
+
+class TestPipePairClass(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        pygame.init()
+        pygame.display.set_mode((800, 600))  # Set up a display mode for testing
+
+    @classmethod
+    def tearDownClass(cls):
+        pygame.quit()
+
+    def test_pipe_pair_initialization(self):
+        # Your existing test code here
+        pass
+
+    def test_pipe_pair_update(self):
+        # Your existing test code here
+        pass
+
+    def test_pipe_pair_collision(self):
+        # Your existing test code here
+        pass
+
+class TestPipePairClass(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        pygame.init()
+        pygame.display.set_mode((800, 600))  # Set up a display mode for testing
+
+    @classmethod
+    def tearDownClass(cls):
+        pygame.quit()
+
+    def test_pipe_pair_height_properties(self):
+        pipe_end_img = pygame.Surface((32, 32))  # Placeholder surface for testing
+        pipe_body_img = pygame.Surface((32, 32))  # Placeholder surface for testing
+        pipe_pair = PipePair(pipe_end_img, pipe_body_img)
+
+        self.assertEqual(pipe_pair.top_height_px, pipe_pair.top_pieces * PipePair.PIECE_HEIGHT)
+        self.assertEqual(pipe_pair.bottom_height_px, pipe_pair.bottom_pieces * PipePair.PIECE_HEIGHT)
+
+def test_pipe_pair_visible_property(self):
+    pipe_end_img = pygame.Surface((32, 32))  # Placeholder surface for testing
+    pipe_body_img = pygame.Surface((32, 32))  # Placeholder surface for testing
+    pipe_pair = PipePair(pipe_end_img, pipe_body_img)
+
+    # Assuming the initial x is within the visible range
+    visible_property = pipe_pair.visible
+    self.assertIsNotNone(visible_property)  # Ensure visible is not None
+    self.assertTrue(visible_property)
+
+    pipe_pair.x = -PipePair.WIDTH - 1
+    visible_property = pipe_pair.visible
+    self.assertIsNotNone(visible_property)  # Ensure visible is not None
+    self.assertFalse(visible_property)  # Now, it's outside the visible range to the left
+
+    pipe_pair.x = WIN_WIDTH + 1
+    visible_property = pipe_pair.visible
+    self.assertIsNotNone(visible_property)  # Ensure visible is not None
+    self.assertFalse(visible_property)  # Now, it's outside the visible range to the right
+
+    def test_pipe_pair_rect_property(self):
+        pipe_end_img = pygame.Surface((32, 32))  # Placeholder surface for testing
+        pipe_body_img = pygame.Surface((32, 32))  # Placeholder surface for testing
+        pipe_pair = PipePair(pipe_end_img, pipe_body_img)
+
+        rect = pipe_pair.rect
+        self.assertEqual(rect.x, pipe_pair.x)
+        self.assertEqual(rect.y, 0)
+        self.assertEqual(rect.width, PipePair.WIDTH)
+        self.assertEqual(rect.height, PipePair.PIECE_HEIGHT)
+
+    def test_pipe_pair_update_method(self):
+        pipe_end_img = pygame.Surface((32, 32))  # Placeholder surface for testing
+        pipe_body_img = pygame.Surface((32, 32))  # Placeholder surface for testing
+        pipe_pair = PipePair(pipe_end_img, pipe_body_img)
+
+        initial_x = pipe_pair.x
+        pipe_pair.update()
+        self.assertLess(pipe_pair.x, initial_x)  # PipePair should move towards the left
+
+    def test_pipe_pair_collides_with_method(self):
+        pipe_end_img = pygame.Surface((32, 32))  # Placeholder surface for testing
+        pipe_body_img = pygame.Surface((32, 32))  # Placeholder surface for testing
+        pipe_pair = PipePair(pipe_end_img, pipe_body_img)
+
+        bird = Bird(100, 200, 1000, (pygame.Surface((32, 32)), pygame.Surface((32, 32))))
+
+        self.assertFalse(pipe_pair.collides_with(bird))  # Assuming no initial collision
+
+        # Assuming a collision (modify the bird's position accordingly)
+        bird.x = pipe_pair.x
+        bird.y = pipe_pair.top_height_px + Bird.HEIGHT // 2
+
+        self.assertTrue(pipe_pair.collides_with(bird))
+
+    def test_load_images_function(self):
+        images = load_images()
+
+        # Check if all required images are loaded
+        self.assertIsInstance(images['background'], pygame.Surface)
+        self.assertIsInstance(images['pipe-end'], pygame.Surface)
+        self.assertIsInstance(images['pipe-body'], pygame.Surface)
+        self.assertIsInstance(images['bird-wingup'], pygame.Surface)
+        self.assertIsInstance(images['bird-wingdown'], pygame.Surface)
+
+def home_screen(display_surface):
+
+    class TestHomeScreenFunction(unittest.TestCase):
+
+     @classmethod
+     def setUpClass(cls):
+        pygame.init()
+
+    @classmethod
+    def tearDownClass(cls):
+        pygame.quit()
+
+    @patch('pygame.event.get')
+    @patch('pygame.display.flip')
+    def test_home_screen(self, mock_display_flip, mock_event_get):
+        # Mock Pygame events for testing
+        mock_event_quit = Mock(type=QUIT)
+        mock_event_key_s = Mock(type=KEYUP, key=K_s)
+        mock_event_key_q = Mock(type=KEYUP, key=K_q)
+
+        # Set the return value of mock_event_get to simulate Pygame events
+        mock_event_get.return_value = [mock_event_quit, mock_event_key_s, mock_event_key_q]
+
+        # Set up Pygame display surface for testing
+        display_surface = pygame.Surface((800, 600))
+
+        # Call the home_screen function
+        home_screen(display_surface)
+
+        # Assertions based on expected behavior
+        mock_display_flip.assert_called_once()  # Assert that display flip is called
+        mock_event_get.assert_called()  # Assert that event.get is called
+
+import unittest
+from unittest.mock import patch, MagicMock
+import pygame
+from flappybird import main, FPS, WIN_WIDTH, WIN_HEIGHT, PipePair, Bird, load_images  # Replace 'your_module' with the actual module name
+
+class TestGameOverLoop(unittest.TestCase):
+
+    def setUp(self):
+        pygame.init()
+
+    def tearDown(self):
+        pygame.quit()
+
+    @patch('pygame.event.get', return_value=[MagicMock(type=QUIT)])
+    def test_game_over_quit(self, mock_event_get):
+        # Test if the game-over loop quits when the QUIT event occurs
+
+        with self.assertRaises(SystemExit):
+            main()
+    @patch('pygame.event.get', return_value=[MagicMock(type=KEYUP, key=K_ESCAPE)])
+    def test_game_over_quit_key(self, mock_event_get):
+        # Test if the game-over loop quits when the 'ESC' key is pressed
+
+        with self.assertRaises(SystemExit):
+            main()
+
+    @patch('pygame.event.get', return_value=[MagicMock(type=KEYUP, key=K_q)])
+    def test_game_over_quit_key(self, mock_event_get):
+        # Test if the game-over loop quits when the 'Q' key is pressed
+
+        with self.assertRaises(SystemExit):
+            main()
+
+if __name__ == '__main__':
+    unittest.main()
